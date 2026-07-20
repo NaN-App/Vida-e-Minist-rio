@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="theme-color" id="meta-theme-color" content="#1c5d63">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cronômetro de Reunião Dinâmico</title>
+    <!-- Importando a fonte Cabin do Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cabin:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #0f4c81;
+            --treasures: #1c5d63;
+            --ministry: #a07128;
+            --life: #7d1c23;
+            --bg-light: #f6f6f9;
+            --text-dark: #333;
+        }
+
+        body {
+            font-family: "Cabin", sans-serif;
+            margin: 0;
+            padding: 12px;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+        }
+
+        .section {
+            background-color: #fff;
+            margin-bottom: 20px;
+            border-radius: 18px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .section-header {
+            font-size: 1em;
+            font-weight: bold;
+            padding: 12px 12px 12px 25px;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sh-treasures { background-color: var(--treasures); }
+        .sh-ministry { background-color: var(--ministry); }
+        .sh-life { background-color: var(--life); }
+
+        .btn-action {
+            font-family: "Cabin", sans-serif;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            width: 25px;
+            height: 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 25px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+            line-height: 3;
+            padding-bottom: 2px;
+        }
+
+        .btn-action:hover {
+            background-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            border-bottom: 1px solid #edf0f5;
+        }
+
+        .item:last-child {
+            border-bottom: none;
+        }
+
+        .details {
+            flex-grow: 1;
+            margin-right: 20px;
+        }
+
+        .inputs-row {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .title-container {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 17px;
+            font-weight: bold;
+            color: #1a1a1a;
+        }
+
+        .number-label {
+            min-width: 15px;
+        }
+
+        /* Regras de cores automáticas para os números de cada seção */
+        #container-treasures .number-label { color: var(--treasures); }
+        #container-ministry .number-label { color: var(--ministry); }
+        #container-life .number-label { color: var(--life); }
+
+        .title-fixed {
+            white-space: nowrap;
+        }
+
+        .title-input {
+            font-family: "Cabin", sans-serif;
+            font-size: 17px;
+            font-weight: bold;
+            color: #1a1a1a;
+            border: none;
+            padding: 2px 0;
+            width: 100%;
+            outline: none;
+            background: transparent;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .name-input {
+            font-family: "Cabin", sans-serif;
+            font-size: 15px;
+            color: #555;
+            border: none;
+            padding: 0 0 2px 0;
+            width: 100%;
+            outline: none;
+            background: transparent;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .timer-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 15px;
+            border: 1px solid rgba(55, 55, 55, 0.2);
+        }
+
+        .timer {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #444;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+            padding: 10px 5px;
+            border-radius: 15px;
+            background-color: #e8ecef;
+            min-width: 70px;
+            text-align: center;
+            transition: background-color 0.2s;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .timer:hover {
+            background-color: #dfedfa;
+        }
+
+        .running {
+            background-color: #d4edda;
+            color: #155724;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PRIMEIRA PARTE: TESOUROS DA PALAVRA DE DEUS -->
+    <div class="section">
+        <div class="section-header sh-treasures" style= "padding: 15px 0 12px 25px;"> 
+            <span>Tesouros da Palavra de Deus</span>
+        </div>
+        <div id="container-treasures">
+            <!-- 1. Editável -->
+            <div class="item">
+                <div class="details">
+                    <div class="inputs-row">
+                        <div class="title-container" style="gap: 2px;">
+                            <span class="number-label"></span>
+                            <input type="text" class="title-input" id="title-1" placeholder="•••" oninput="saveData()" style="color: #1c5d63;">
+                        </div>
+                        <input type="text" class="name-input" id="name-1" placeholder="Nome do irmão" oninput="saveData()">
+                    </div>
+                </div>
+                <div class="timer-container"><div class="timer" tabindex="0">00:00</div></div>
+            </div>
+
+            <!-- 2. Joias Espirituais -->
+            <div class="item">
+                <div class="details">
+                    <div class="inputs-row">
+                        <div class="title-container" style="gap: 3px;">
+                            <span class="number-label"></span>
+                            <span class="title-fixed" style="color: #1c5d63;">Joias Espirituais</span>
+                        </div>
+                        <input type="text" class="name-input" id="name-2" placeholder="Nome do irmão" oninput="saveData()">
+                    </div>
+                </div>
+                <div class="timer-container"><div class="timer" tabindex="0">00:00</div></div>
+            </div>
+
+            <!-- 3. Leitura da Bíblia -->
+            <div class="item">
+                <div class="details">
+                    <div class="inputs-row">
+                        <div class="title-container" style="gap: 3px;">
+                            <span class="number-label"></span>
+                            <span class="title-fixed" style="color: #1c5d63;">Leitura da Bíblia – </span>
+                            <input type="text" class="title-input" style="color: #1c5d63" id="title-3" placeholder="•••" oninput="saveData()">
+                        </div>
+                        <input type="text" class="name-input" id="name-3" placeholder="Nome do irmão" oninput="saveData()">
+                    </div>
+                </div>
+                <div class="timer-container"><div class="timer" tabindex="0">00:00</div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SEGUNDA PARTE: FAÇA SEU MELHOR NO MINISTÉRIO -->
+    <div class="section">
+        <div class="section-header sh-ministry">
+            <span>Faça seu Melhor no Ministério</span>
+            <div style="display: flex; gap: 5px;">
+                <button class="btn-action" style= "padding-bottom: 4px;" onclick="addItem('container-ministry', 4)">+</button>
+                <button class="btn-action" onclick="removeItem('container-ministry', 3)">-</button>
+            </div>
+        </div>
+        <div id="container-ministry">
+            <!-- Gerados via Script -->
+            
+        </div>
+    </div>
+
+    <!-- TERCEIRA PARTE: NOSSA VIDA CRISTÃ -->
+    <div class="section">
+        <div class="section-header sh-life">
+            <span>Nossa Vida Cristã</span>
+            <div style="display: flex; gap: 5px;">
+                <button class="btn-action" style= "padding-bottom: 4px;" onclick="addItem('container-life')">+</button>
+                <button class="btn-action" onclick="removeItem('container-life', 2)">-</button>
+            </div>
+        </div>
+        <div id="container-life">
+            <!-- Gerados via Script -->
+        </div>
+    </div>
+
+    <script>
+        // Agora aceita um terceiro parâmetro opcional com a cor customizada do input
+        function createItemHTML(savedTitle = '', savedName = '', inputColor = '#1a1a1a') {
+            const item = document.createElement('div');
+            item.className = 'item';
+            item.innerHTML = `
+                <div class="details">
+                    <div class="inputs-row">
+                        <div class="title-container">
+                            <span class="number-label"></span>
+                            <input type="text" class="title-input" placeholder="•••" value="${savedTitle}" oninput="saveData()" style="color: ${inputColor};">
+                        </div>
+                        <input type="text" class="name-input" placeholder="Nome do irmão" value="${savedName}" oninput="saveData()">
+                    </div>
+                </div>
+                <div class="timer-container"><div class="timer" tabindex="0">00:00</div></div>
+            `;
+            initTimer(item.querySelector('.timer'));
+            return item;
+        }
+
+        function addItem(containerId, maxItems = null, savedTitle = '', savedName = '') {
+            const container = document.getElementById(containerId);
+            if (maxItems && container.children.length >= maxItems) return;
+
+            // Define dinamicamente a cor com base no container alvo
+            let color = '#1a1a1a';
+            if (containerId === 'container-ministry') color = '#a07128'; // Amarelo/Mostarda
+            if (containerId === 'container-life') color = '#7d1c23';      // Vermelho
+            
+
+            container.appendChild(createItemHTML(savedTitle, savedName, color));
+            updateNumbers();
+            saveData();
+        }
+
+        function removeItem(containerId, minItems = 0) {
+            const container = document.getElementById(containerId);
+            if (container.children.length > minItems) {
+                const lastTimer = container.lastChild.querySelector('.timer');
+                if (lastTimer && lastTimer.stopActiveTimer) lastTimer.stopActiveTimer();
+                container.removeChild(container.lastChild);
+                updateNumbers();
+                saveData();
+            }
+        }
+
+        function updateNumbers() {
+            const labels = document.querySelectorAll('.number-label');
+            labels.forEach((label, index) => {
+                label.textContent = `${index + 1}.`;
+            });
+        }
+
+        function saveData() {
+            const data = {
+                treasures: {
+                    title1: document.getElementById('title-1').value,
+                    name1: document.getElementById('name-1').value,
+                    name2: document.getElementById('name-2').value,
+                    title3: document.getElementById('title-3').value,
+                    name3: document.getElementById('name-3').value
+                },
+                ministry: [],
+                life: []
+            };
+
+            document.querySelectorAll('#container-ministry .item').forEach(item => {
+                data.ministry.push({
+                    title: item.querySelector('.title-input').value,
+                    name: item.querySelector('.name-input').value
+                });
+            });
+
+            document.querySelectorAll('#container-life .item').forEach(item => {
+                data.life.push({
+                    title: item.querySelector('.title-input').value,
+                    name: item.querySelector('.name-input').value
+                });
+            });
+
+            localStorage.setItem('cronometro_reuniao_data', JSON.stringify(data));
+        }
+
+        function loadData() {
+            const savedData = localStorage.getItem('cronometro_reuniao_data');
+            
+            document.querySelectorAll('#container-treasures .timer').forEach(initTimer);
+
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                
+                document.getElementById('title-1').value = data.treasures.title1 || '';
+                document.getElementById('name-1').value = data.treasures.name1 || '';
+                document.getElementById('name-2').value = data.treasures.name2 || '';
+                document.getElementById('title-3').value = data.treasures.title3 || '';
+                document.getElementById('name-3').value = data.treasures.name3 || '';
+
+                if (data.ministry && data.ministry.length > 0) {
+                    data.ministry.forEach(item => addItem('container-ministry', 4, item.title, item.name));
+                } else {
+                    for(let i=0; i<3; i++) addItem('container-ministry');
+                }
+
+                if (data.life && data.life.length > 0) {
+                    data.life.forEach(item => addItem('container-life', null, item.title, item.name));
+                } else {
+                    for(let i=0; i<2; i++) addItem('container-life');
+                }
+            } else {
+                for(let i=0; i<3; i++) addItem('container-ministry');
+                for(let i=0; i<2; i++) addItem('container-life');
+            }
+            updateNumbers();
+        }
+
+                function initTimer(timer) {
+            let secondsElapsed = 0;
+            let timerId = null;
+            let isRunning = false;
+            let pressTimer = null;
+            let clickTimeout = null;
+            let startTime = null; // Armazena a hora real em que o cronômetro começou
+
+            function updateDisplay() {
+                let minutes = Math.floor(secondsElapsed / 60);
+                let seconds = secondsElapsed % 60;
+                timer.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+
+            function startTimer() {
+                isRunning = true;
+                timer.classList.add('running');
+                
+                // Calcula a hora de início real subtraindo o tempo que já havia passado (caso estivesse pausado)
+                startTime = Date.now() - (secondsElapsed * 1000);
+                
+                timerId = setInterval(() => {
+                    // Atualiza os segundos baseado no relógio do sistema, independente se a tela congelou
+                    secondsElapsed = Math.floor((Date.now() - startTime) / 1000);
+                    updateDisplay();
+                }, 200); // Roda em intervalos mais curtos para manter a precisão visual
+            }
+
+            function stopTimer() {
+                if (timerId) {
+                    clearInterval(timerId);
+                    timerId = null;
+                }
+                isRunning = false;
+                timer.classList.remove('running');
+            }
+
+            function resetTimer() {
+                stopTimer();
+                secondsElapsed = 0;
+                updateDisplay();
+            }
+
+            timer.stopActiveTimer = stopTimer;
+
+            timer.addEventListener('click', () => {
+                if (clickTimeout) return; 
+
+                clickTimeout = setTimeout(() => {
+                    clickTimeout = null;
+                    if (!isRunning) startTimer();
+                    else stopTimer();
+                }, 250); 
+            });
+
+            timer.addEventListener('dblclick', (e) => {
+                e.stopPropagation();
+                if (clickTimeout) {
+                    clearTimeout(clickTimeout);
+                    clickTimeout = null;
+                }
+                resetTimer();
+            });
+
+            const startPress = (e) => {
+                pressTimer = setTimeout(() => {
+                    if (clickTimeout) {
+                        clearTimeout(clickTimeout);
+                        clickTimeout = null;
+                    }
+                    resetTimer();
+                }, 800);
+            };
+
+            const cancelPress = () => {
+                clearTimeout(pressTimer);
+            };
+
+            timer.addEventListener('mousedown', startPress);
+            timer.addEventListener('mouseup', cancelPress);
+            timer.addEventListener('mouseleave', cancelPress);
+            timer.addEventListener('touchstart', startPress);
+            timer.addEventListener('touchend', cancelPress);
+
+            updateDisplay();
+        }
+        
+
+        window.addEventListener('DOMContentLoaded', loadData);
+    </script>
+</body>
+</html>
