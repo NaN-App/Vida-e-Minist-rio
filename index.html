@@ -2,23 +2,23 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="theme-color" id="meta-theme-color" content="#f6f6f9">
-        <!-- Vínculo do Manifesto PWA -->
+    <meta name="theme-color" id="meta-theme-color" content="#7d1c23">
+    <!-- Vínculo do Manifesto PWA -->
     <link rel="manifest" href="./manifest.json">
 
     <!-- Script para Registrar o Service Worker -->
     <script>
         if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('Service Worker registrado com sucesso!', reg))
-        .catch(err => console.log('Erro ao registrar Service Worker:', err));
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('Service Worker registrado com sucesso!', reg))
+                .catch(err => console.log('Erro ao registrar Service Worker:', err));
             });
         }
     </script>
     
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cronômetro de Reunião Dinâmico</title>
+    <title>Vida e Ministério</title>
     <!-- Importando a fonte Cabin do Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -37,9 +37,31 @@
         body {
             font-family: "Cabin", sans-serif;
             margin: 0;
-            padding: 40px 12px 10px 12px;
+            padding: 110px 12px 10px 12px; /* Ajustado padding superior para dar espaço ao header fixo */
             background-color: var(--bg-light);
             color: var(--text-dark);
+        }
+
+        /* HEADER FIXO NO TOPO */
+        .main-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #7d1c23;
+            color: #ffffff;
+            text-align: center;
+            padding: 20px 0;
+            border-radius: 0 0 35px 35px;
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+        }
+
+        .main-header h1 {
+            margin: 0;
+            font-size: 2.7em;
+            font-weight: bold;
+            letter-spacing: 0.5px;
         }
 
         .section {
@@ -194,9 +216,14 @@
 </head>
 <body>
 
+    <!-- HEADER FIXO -->
+    <header class="main-header">
+        <h1>Vida e Ministério</h1>
+    </header>
+
     <!-- PRIMEIRA PARTE: TESOUROS DA PALAVRA DE DEUS -->
     <div class="section">
-        <div class="section-header sh-treasures" style= "padding: 15px 0 12px 20px;"> 
+        <div class="section-header sh-treasures" style="padding: 15px 0 12px 20px;"> 
             <span>Tesouros da Palavra de Deus</span>
         </div>
         <div id="container-treasures">
@@ -247,25 +274,24 @@
 
     <!-- SEGUNDA PARTE: FAÇA SEU MELHOR NO MINISTÉRIO -->
     <div class="section">
-        <div class="section-header sh-ministry" style= "padding: 12px 15px 12px 20px;">
+        <div class="section-header sh-ministry" style="padding: 12px 15px 12px 20px;">
             <span>Faça seu Melhor no Ministério</span>
             <div style="display: flex; gap: 5px;">
-                <button class="btn-action" style= "padding-bottom: 4px;" onclick="addItem('container-ministry', 4)">+</button>
+                <button class="btn-action" style="padding-bottom: 4px;" onclick="addItem('container-ministry', 4)">+</button>
                 <button class="btn-action" onclick="removeItem('container-ministry', 3)">-</button>
             </div>
         </div>
         <div id="container-ministry">
             <!-- Gerados via Script -->
-            
         </div>
     </div>
 
     <!-- TERCEIRA PARTE: NOSSA VIDA CRISTÃ -->
     <div class="section">
-        <div class="section-header sh-life" style= "padding: 12px 15px 12px 20px;">
+        <div class="section-header sh-life" style="padding: 12px 15px 12px 20px;">
             <span>Nossa Vida Cristã</span>
             <div style="display: flex; gap: 5px;">
-                <button class="btn-action" style= "padding-bottom: 4px;" onclick="addItem('container-life')">+</button>
+                <button class="btn-action" style="padding-bottom: 4px;" onclick="addItem('container-life')">+</button>
                 <button class="btn-action" onclick="removeItem('container-life', 2)">-</button>
             </div>
         </div>
@@ -275,7 +301,6 @@
     </div>
 
     <script>
-        // Agora aceita um terceiro parâmetro opcional com a cor customizada do input
         function createItemHTML(savedTitle = '', savedName = '', inputColor = '#1a1a1a') {
             const item = document.createElement('div');
             item.className = 'item';
@@ -299,11 +324,9 @@
             const container = document.getElementById(containerId);
             if (maxItems && container.children.length >= maxItems) return;
 
-            // Define dinamicamente a cor com base no container alvo
             let color = '#1a1a1a';
-            if (containerId === 'container-ministry') color = '#a07128'; // Amarelo/Mostarda
-            if (containerId === 'container-life') color = '#7d1c23';      // Vermelho
-            
+            if (containerId === 'container-ministry') color = '#a07128'; 
+            if (containerId === 'container-life') color = '#7d1c23';      
 
             container.appendChild(createItemHTML(savedTitle, savedName, color));
             updateNumbers();
@@ -390,13 +413,13 @@
             updateNumbers();
         }
 
-                function initTimer(timer) {
+        function initTimer(timer) {
             let secondsElapsed = 0;
             let timerId = null;
             let isRunning = false;
             let pressTimer = null;
             let clickTimeout = null;
-            let startTime = null; // Armazena a hora real em que o cronômetro começou
+            let startTime = null; 
 
             function updateDisplay() {
                 let minutes = Math.floor(secondsElapsed / 60);
@@ -408,14 +431,12 @@
                 isRunning = true;
                 timer.classList.add('running');
                 
-                // Calcula a hora de início real subtraindo o tempo que já havia passado (caso estivesse pausado)
                 startTime = Date.now() - (secondsElapsed * 1000);
                 
                 timerId = setInterval(() => {
-                    // Atualiza os segundos baseado no relógio do sistema, independente se a tela congelou
                     secondsElapsed = Math.floor((Date.now() - startTime) / 1000);
                     updateDisplay();
-                }, 200); // Roda em intervalos mais curtos para manter a precisão visual
+                }, 200); 
             }
 
             function stopTimer() {
@@ -476,7 +497,6 @@
 
             updateDisplay();
         }
-        
 
         window.addEventListener('DOMContentLoaded', loadData);
     </script>
