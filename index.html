@@ -37,30 +37,27 @@
         body {
             font-family: "Cabin", sans-serif;
             margin: 0;
-            padding: 70px 12px 10px 12px; /* Ajustado padding superior para dar espaço ao header fixo */
+            padding: 15px 12px 10px 12px; /* Ajustado para manter o espaçamento superior adequado ao card */
             background-color: var(--bg-light);
             color: var(--text-dark);
         }
 
-        /* HEADER FIXO NO TOPO */
-        .main-header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background-color: #f6f6f9;
-            color: #7d1c23;
+        /* CARD DO TÍTULO */
+        .title-card {
+            background-color: #444;
+            color: #fff;
+            border: 0.5px solid rgba(20, 20, 20, 0.4);
             text-align: center;
-            padding: 5px 0;
-            border-radius: 0 0 15px 15px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.0);
+            padding: 12px 5px;
+            border-radius: 20px;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
             text-transform: uppercase;
-            z-index: 1000;
+            margin-bottom: 20px;
         }
 
-        .main-header h1 {
+        .title-card h1 {
             margin: 0;
-            font-size: 2.3em;
+            font-size: 2.1em;
             font-weight: 700;
             letter-spacing: 0.6px;
         }
@@ -217,8 +214,8 @@
 </head>
 <body>
 
-    <!-- HEADER FIXO -->
-    <header class="main-header">
+    <!-- CARD DO TÍTULO -->
+    <header class="title-card">
         <h1>Vida & Ministério</h1>
     </header>
 
