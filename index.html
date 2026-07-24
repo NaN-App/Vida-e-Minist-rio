@@ -37,7 +37,7 @@
         body {
             font-family: "Cabin", sans-serif;
             margin: 0;
-            padding: 5px 12px 10px 12px; /* Ajustado para manter o espaçamento superior adequado ao card */
+            padding: 5px 12px 10px 12px;
             background-color: var(--bg-light);
             color: var(--text-dark);
         }
@@ -146,7 +146,6 @@
             min-width: 15px;
         }
 
-        /* Regras de cores automáticas para os números de cada seção */
         #container-treasures .number-label { color: var(--treasures); }
         #container-ministry .number-label { color: var(--ministry); }
         #container-life .number-label { color: var(--life); }
@@ -200,16 +199,26 @@
             background-color: #e8ecef;
             min-width: 70px;
             text-align: center;
-            transition: background-color 0.2s;
+            transition: background-color 0.3s, color 0.3s;
             outline: none;
             -webkit-tap-highlight-color: transparent;
         }
 
-        .running {
+        /* Estilos de Estado do Cronômetro */
+        .timer.running {
             background-color: #505050;
             color: #eeeeee;
         }
-        
+
+        .timer.timer-ok {
+            background-color: #2e7d32 !important; /* Verde */
+            color: #ffffff !important;
+        }
+
+        .timer.timer-over {
+            background-color: #c62828 !important; /* Vermelho */
+            color: #ffffff !important;
+        }
     </style>
 </head>
 <body>
@@ -413,28 +422,67 @@
 
         function initTimer(timer) {
             let secondsElapsed = 0;
+            let limitSeconds = null; // Tempo limite em segundos
             let timerId = null;
             let isRunning = false;
             let pressTimer = null;
             let clickTimeout = null;
             let startTime = null; 
+            let isLongPress = false;
 
             function updateDisplay() {
                 let minutes = Math.floor(secondsElapsed / 60);
                 let seconds = secondsElapsed % 60;
                 timer.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                updateVisualState();
+            }
+
+            function updateVisualState() {
+                // Limpa classes anteriores
+                timer.classList.remove('running', 'timer-ok', 'timer-over');
+
+                // Quando zerado, fica com a aparência padrão
+                if (secondsElapsed === 0) {
+                    return;
+                }
+
+                // Se houver limite configurado
+                if (limitSeconds && limitSeconds > 0) {
+                    if (secondsElapsed <= limitSeconds) {
+                        timer.classList.add('timer-ok'); // Verde
+                    } else {
+                        timer.classList.add('timer-over'); // Vermelho
+                    }
+                } else {
+                    // Sem limite definido, fica cinza escuro se rodando
+                    if (isRunning) timer.classList.add('running');
+                }
+            }
+
+            function setLimit() {
+                let currentMin = limitSeconds ? (limitSeconds / 60) : '';
+                let input = prompt('Defina o tempo limite (em minutos):\nExemplo: 5 para 5 min, ou 0 para remover:', currentMin);
+                
+                if (input !== null) {
+                    let parsed = parseFloat(input.replace(',', '.'));
+                    if (!isNaN(parsed) && parsed > 0) {
+                        limitSeconds = Math.round(parsed * 60);
+                    } else {
+                        limitSeconds = null;
+                    }
+                    updateVisualState();
+                }
             }
 
             function startTimer() {
                 isRunning = true;
-                timer.classList.add('running');
-                
                 startTime = Date.now() - (secondsElapsed * 1000);
                 
                 timerId = setInterval(() => {
                     secondsElapsed = Math.floor((Date.now() - startTime) / 1000);
                     updateDisplay();
                 }, 200); 
+                updateVisualState();
             }
 
             function stopTimer() {
@@ -443,7 +491,7 @@
                     timerId = null;
                 }
                 isRunning = false;
-                timer.classList.remove('running');
+                updateVisualState();
             }
 
             function resetTimer() {
@@ -454,7 +502,12 @@
 
             timer.stopActiveTimer = stopTimer;
 
+            // Clique Simples: Iniciar / Pausar
             timer.addEventListener('click', () => {
+                if (isLongPress) {
+                    isLongPress = false;
+                    return;
+                }
                 if (clickTimeout) return; 
 
                 clickTimeout = setTimeout(() => {
@@ -464,6 +517,7 @@
                 }, 250); 
             });
 
+            // Duplo Clique: Zerar
             timer.addEventListener('dblclick', (e) => {
                 e.stopPropagation();
                 if (clickTimeout) {
@@ -473,14 +527,17 @@
                 resetTimer();
             });
 
+            // Aperte e Segure (Long Press): Definir Tempo Limite
             const startPress = (e) => {
+                isLongPress = false;
                 pressTimer = setTimeout(() => {
+                    isLongPress = true;
                     if (clickTimeout) {
                         clearTimeout(clickTimeout);
                         clickTimeout = null;
                     }
-                    resetTimer();
-                }, 800);
+                    setLimit();
+                }, 700);
             };
 
             const cancelPress = () => {
