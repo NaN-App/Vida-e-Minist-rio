@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cronometro-v1.2';
+const CACHE_NAME = 'cronometro-v1.3';
 const ASSETS = [
   './',
   './index.html', // Caso seu arquivo principal se chame index.html no GitHub
